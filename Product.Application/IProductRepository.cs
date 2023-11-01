@@ -13,7 +13,7 @@ namespace Product.Application
         Task<ProductModel> GetProductById(int id);
         Task<ProductModel> AddProduct(ProductModel model);
         Task<ProductModel> UpdateProduct(ProductModel model);
-        Task<ProductModel> DeleteProduct(int id);
+        Task DeleteProduct(int id);
 
 
     }

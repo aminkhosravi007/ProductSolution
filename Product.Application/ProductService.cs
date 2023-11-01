@@ -20,9 +20,9 @@ namespace Product.Application
             return model;
         }
 
-        public async Task<ProductModel> DeleteProduct(int id)
+        public async Task DeleteProduct(int id)
         {
-            return await _repository.DeleteProduct(id);
+            await _repository.DeleteProduct(id);
         }
 
         public Task<List<ProductModel>> GetAllProducts()
