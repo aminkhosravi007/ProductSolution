@@ -11,7 +11,8 @@ namespace Product.Domain
     {
         [Key]
         public int Id { get; set; }
-        [Phone]
+        [Required]
+        [RegularExpression("^09(1[0-9]|3[1-9]|2[1-9])-?[0-9]{3}-?[0-9]{4}", ErrorMessage = "شماره همراه معتبر نیست")]
         public string? ManufacturePhone { get; set; }
         [EmailAddress]
         public string? ManufactureEmail { get; set; }

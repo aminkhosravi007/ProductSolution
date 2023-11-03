@@ -14,7 +14,7 @@ namespace Product.Domain
         public int Id { get; set; }
         [MaxLength(50)]
         public string? Name { get; set; }
-        public DateTime ProductDate { get; set; }
+        public string ProductDate { get; set; } = DateTime.Now.ToShortDateString();
         public bool? IsAvailable { get; set; }
         public int ManufactureId { get; set; }
         [ForeignKey("ManufactureId")]

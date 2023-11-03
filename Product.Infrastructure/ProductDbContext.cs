@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Product.Domain;
 using System;
 using System.Collections.Generic;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Product.Infrastructure
 {
-    public class ProductDbContext : DbContext, IProductDbContext
+    public class ProductDbContext : IdentityDbContext<IdentityUser>, IProductDbContext
     {
         public ProductDbContext(DbContextOptions<ProductDbContext> options): base(options)
         {
@@ -16,5 +18,25 @@ namespace Product.Infrastructure
         }
         public DbSet<ProductModel> Products { get; set; }
         public DbSet<Manufacture> Manufactures { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<Manufacture>().HasData(
+                new Manufacture
+                {
+                    Id = 1,
+                    ManufactureEmail = "khosh@gmail.com",
+                    ManufacturePhone = "02134121995"
+                },
+                new Manufacture
+                {
+                    Id=2,
+                    ManufactureEmail = "khosh@yahoo.com",
+                    ManufacturePhone = "02154144444"
+                }
+                );
+        }
     }
 }
