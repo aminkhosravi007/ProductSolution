@@ -14,5 +14,6 @@ namespace Product.Application
         Task<ProductModel> AddProduct(ProductModel model);
         Task<ProductModel> UpdateProduct(ProductModel model);
         Task DeleteProduct(int id);
+        Task<List<ProductModel>> GetProductsIssuedByAdmin(string adminEmail);
     }
 }

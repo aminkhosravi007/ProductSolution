@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Product.Application;
 using Product.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,13 +14,16 @@ namespace Product.Infrastructure
     public class ProductRepository : IProductRepository
     {
         private readonly ProductDbContext _dbContext;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public ProductRepository(ProductDbContext dbContext)
+        public ProductRepository(ProductDbContext dbContext, IHttpContextAccessor contextAccessor)
         {
             _dbContext = dbContext;
+            _contextAccessor = contextAccessor;
         }
         public async Task<ProductModel> AddProduct(ProductModel model)
         {
+            model.IssuedAdminToken = _contextAccessor.HttpContext.Session.GetString("email");
             await _dbContext.Products.AddAsync(model);
             await _dbContext.SaveChangesAsync();
             return model;
@@ -47,8 +52,14 @@ namespace Product.Infrastructure
         public async Task<ProductModel> UpdateProduct(ProductModel model)
         {
             _dbContext.Products.Update(model);
+            _dbContext.Entry(model).Property(x => x.IssuedAdminToken).IsModified = false;
             await _dbContext.SaveChangesAsync();
             return model;
+        }
+        public async Task<List<ProductModel>> GetProductsIssuedByAdmin(string adminEmail)
+        {
+            var products = await _dbContext.Products.Where(p=> p.IssuedAdminToken.Contains(adminEmail)).ToListAsync();
+            return products;
         }
     }
 }

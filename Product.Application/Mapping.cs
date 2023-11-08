@@ -12,7 +12,8 @@ namespace Product.Application
     {
         public Mapping()
         {
-            CreateMap<ProductModel, ProductModelDTO>().ReverseMap();
+            CreateMap<ProductModelDTO, ProductModel>().ForMember(dest=> dest.IssuedAdminToken,
+                opt=> opt.Ignore()).ReverseMap();
         }
     }
 }

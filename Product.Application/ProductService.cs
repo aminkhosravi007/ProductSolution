@@ -40,5 +40,10 @@ namespace Product.Application
             await _repository.UpdateProduct(model);
             return model;
         }
+        public async Task<List<ProductModel>> GetProductsIssuedByAdmin(string adminEmail)
+        {
+           return await _repository.GetProductsIssuedByAdmin(adminEmail);
+
+        }
     }
 }

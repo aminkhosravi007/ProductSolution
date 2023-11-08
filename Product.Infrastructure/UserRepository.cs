@@ -44,7 +44,9 @@ namespace Product.Infrastructure
                     value: model.Email
                     );
                 await _userManager.AddClaimAsync(user, claim);
-                var result = await _userManager.CreateAsync(user, model.Password);
+                await _userManager.CreateAsync(user, model.Password);
+                Thread.Sleep(3000);
+                await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
             }
         }
     }

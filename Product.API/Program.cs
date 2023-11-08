@@ -54,6 +54,12 @@ builder.Services.AddAuthorization(c =>
         policy.RequireClaim(ClaimTypes.Role, ClaimsPrincipal.Current?.Identity.Name);
     });
 });
+builder.Services.AddSession(opt =>
+{
+    opt.Cookie.Name = "Cookie";
+    opt.IdleTimeout = TimeSpan.FromSeconds(300);
+});
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddAuthentication(options => {
 
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -82,6 +88,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseSession();
 app.UseAuthentication();
 
 app.UseAuthorization();

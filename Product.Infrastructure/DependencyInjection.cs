@@ -37,6 +37,7 @@ namespace Product.Infrastructure
             }).AddEntityFrameworkStores<ProductDbContext>().AddDefaultTokenProviders();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddHttpContextAccessor();
 
 
             return services;

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Product.Infrastructure
 {
-    public class ProductDbContext : IdentityDbContext<IdentityUser>, IProductDbContext
+    public class ProductDbContext : IdentityDbContext<User>, IProductDbContext
     {
         public ProductDbContext(DbContextOptions<ProductDbContext> options): base(options)
         {
