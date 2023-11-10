@@ -35,6 +35,12 @@ namespace Product.Infrastructure
                     Id=2,
                     ManufactureEmail = "khosh@yahoo.com",
                     ManufacturePhone = "02154144444"
+                },
+                new Manufacture
+                {
+                    Id = 3,
+                    ManufactureEmail = "nadin@yahoo.com",
+                    ManufacturePhone = "02154144344"
                 }
                 );
         }

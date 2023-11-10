@@ -24,29 +24,27 @@ namespace Product.API.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IConfiguration _configuration;
-        private readonly IMapper _mapper;
-        private readonly IUserService _userService;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ProductDbContext _productDbContext;
 
-        public ProductController(IMediator mediator, IUserService userService, IConfiguration configuration, UserManager<User> userManager, ProductDbContext productDbContext
-            , SignInManager<User> signInManager, IMapper mapper)
+        public ProductController(IMediator mediator, IConfiguration configuration, UserManager<User> userManager, ProductDbContext productDbContext
+            , SignInManager<User> signInManager)
         {
             _mediator = mediator;
-            _userService = userService;
             _configuration = configuration;
             _userManager = userManager;
             _productDbContext = productDbContext;
             _signInManager = signInManager;
-            _mapper = mapper;
         }
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllProducts()
         {
             var products = await _mediator.Send(new GetAllProductsQuery());
             return Ok(products);
         }
+        [AllowAnonymous]
         [HttpGet("GetAllProductsIssuedByAdmin/{adminEmail}")]
         public async Task<IActionResult> GetAllProductsIssuedByAdmin(string adminEmail)
         {
@@ -80,7 +78,7 @@ namespace Product.API.Controllers
             var dbProduct = await _productDbContext.Products.FindAsync(product.Id);
             if (product == null)
             {
-                return BadRequest("Not found such a product");
+                return NotFound("Not found such a product");
             }
             else if (dbProduct?.IssuedAdminToken == User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value)
             {
@@ -115,7 +113,7 @@ namespace Product.API.Controllers
             if(_productDbContext.Users.Any(u=> u.UserName == model.Email))
             {
                 var registeredUser = await _userManager.FindByEmailAsync(model.Email);
-               var result = await _signInManager.PasswordSignInAsync(registeredUser, model.Password, false, false);
+                var result = await _signInManager.PasswordSignInAsync(registeredUser, model.Password, false, false);
                 if (!result.Succeeded) {
                     return BadRequest(result);
                 }
@@ -128,10 +126,6 @@ namespace Product.API.Controllers
                     Email = model.Email
 
                 };
-                var claim = new Claim(
-                    type: ClaimTypes.Role,
-                    value: model.Email
-                    );
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (!result.Succeeded) { 
                     foreach(var error in result.Errors)
