@@ -24,18 +24,16 @@ namespace Product.API.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IConfiguration _configuration;
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
         private readonly ProductDbContext _productDbContext;
+        private readonly IUserService _userService;
 
-        public ProductController(IMediator mediator, IConfiguration configuration, UserManager<User> userManager, ProductDbContext productDbContext
-            , SignInManager<User> signInManager)
+        public ProductController(IMediator mediator, IConfiguration configuration, ProductDbContext productDbContext
+            , IUserService userService)
         {
             _mediator = mediator;
             _configuration = configuration;
-            _userManager = userManager;
             _productDbContext = productDbContext;
-            _signInManager = signInManager;
+            _userService = userService;
         }
         [HttpGet]
         [AllowAnonymous]
@@ -110,32 +108,7 @@ namespace Product.API.Controllers
         [HttpPost, Route("login")]
         public async Task<IActionResult> Login(UserModel model)
         {
-            if(_productDbContext.Users.Any(u=> u.UserName == model.Email))
-            {
-                var registeredUser = await _userManager.FindByEmailAsync(model.Email);
-                var result = await _signInManager.PasswordSignInAsync(registeredUser, model.Password, false, false);
-                if (!result.Succeeded) {
-                    return BadRequest(result);
-                }
-            }
-            else
-            {
-                var user = new User
-                {
-                    UserName = model.Email,
-                    Email = model.Email
-
-                };
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (!result.Succeeded) { 
-                    foreach(var error in result.Errors)
-                    {
-                        return BadRequest(error.Description);
-                    }
-                }
-                Thread.Sleep(3000);
-                await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
-            }
+            await _userService.LoginUser(model);
             HttpContext.Session.SetString("email", model.Email);
 
             return Ok(new {token = CreateToken(model.Email)});
