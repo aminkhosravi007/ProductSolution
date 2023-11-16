@@ -28,26 +28,29 @@ namespace Product.Infrastructure
         public async Task LoginUser(UserModel model)
         {
             if(model == null) throw new ArgumentNullException("model");
-            if(_productDbContext.Users.Any(c=> c.Email == model.Email))
+            try
             {
-                await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
-            }
-            else
-            {
-                var user = new User
+                if (_productDbContext.Users.Any(c => c.Email == model.Email))
                 {
-                    UserName = model.Email,
-                    Email = model.Email
-                };
-                Claim claim = new Claim(
-                    type: ClaimTypes.Role,
-                    value: model.Email
-                    );
-                await _userManager.AddClaimAsync(user, claim);
-                await _userManager.CreateAsync(user, model.Password);
-                Thread.Sleep(3000);
-                await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+                    await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+                }
+                else
+                {
+                    var user = new User
+                    {
+                        UserName = model.Email,
+                        Email = model.Email
+                    };
+                    await _userManager.CreateAsync(user, model.Password);
+                    Thread.Sleep(3000);
+                    await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+                }
             }
+            catch(Exception ex)
+            {
+                string result = ex.Message;
+            }
+            
         }
     }
 }

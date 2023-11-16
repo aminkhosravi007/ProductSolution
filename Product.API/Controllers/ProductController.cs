@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Product.Application;
 using Product.Application.Commands;
 using Product.Application.Queries;
@@ -24,18 +25,17 @@ namespace Product.API.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IConfiguration _configuration;
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly ProductDbContext _productDbContext;
+        private readonly IUserService _userService;
+        private readonly IProductService _productService;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public ProductController(IMediator mediator, IConfiguration configuration, UserManager<User> userManager, ProductDbContext productDbContext
-            , SignInManager<User> signInManager)
+        public ProductController(IConfiguration configuration, IUserService userService, IProductService productService, IHttpContextAccessor contextAccessor ,IMediator mediator)
         {
-            _mediator = mediator;
             _configuration = configuration;
-            _userManager = userManager;
-            _productDbContext = productDbContext;
-            _signInManager = signInManager;
+            _userService = userService;
+            _mediator = mediator;
+            _productService = productService;
+            _contextAccessor = contextAccessor;
         }
         [HttpGet]
         [AllowAnonymous]
@@ -61,21 +61,23 @@ namespace Product.API.Controllers
             return Ok(product);
         }
         [HttpPost]
-        public async Task<IActionResult> AddProduct(AddProductCommand command)
+        public async Task<IActionResult> AddProduct([FromBody] ProductModelDTO dTO)
         {
-            if(command == null)
+            var command = new AddProductCommand(dTO);
+            if(dTO == null)
             {
                 return BadRequest("Invalid data!");
             }
             await _mediator.Send(command);
-            return CreatedAtRoute("GetProduct", new {id = command.product.Id}, command.product);
+            return CreatedAtRoute("GetProduct", new {id = dTO.Id}, dTO);
 
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateProduct(UpdateProductCommand command)
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductModelDTO dTO)
         {
-            var product = await _mediator.Send(new GetProductByIdQuery(command.product.Id));
-            var dbProduct = await _productDbContext.Products.FindAsync(product.Id);
+            var command = new UpdateProductCommand(dTO);
+            var product = await _mediator.Send(new GetProductByIdQuery(dTO.Id));
+            var dbProduct = await _productService.GetProductById(dTO.Id);
             if (product == null)
             {
                 return NotFound("Not found such a product");
@@ -83,7 +85,7 @@ namespace Product.API.Controllers
             else if (dbProduct?.IssuedAdminToken == User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value)
             {
                 await _mediator.Send(command);
-                return CreatedAtRoute("GetProduct", new { id = command.product.Id }, command.product);
+                return CreatedAtRoute("GetProduct", new { id = dTO.Id }, dTO);
             }
             return Unauthorized();
             
@@ -93,7 +95,7 @@ namespace Product.API.Controllers
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var product = await _mediator.Send(new GetProductByIdQuery(id));
-            var dbProduct = await _productDbContext.Products.FindAsync(product.Id);
+            var dbProduct = await _productService.GetProductById(id);
             if (product == null)
             {
                 return NotFound("Not found such a product");
@@ -110,32 +112,33 @@ namespace Product.API.Controllers
         [HttpPost, Route("login")]
         public async Task<IActionResult> Login(UserModel model)
         {
-            if(_productDbContext.Users.Any(u=> u.UserName == model.Email))
-            {
-                var registeredUser = await _userManager.FindByEmailAsync(model.Email);
-                var result = await _signInManager.PasswordSignInAsync(registeredUser, model.Password, false, false);
-                if (!result.Succeeded) {
-                    return BadRequest(result);
-                }
-            }
-            else
-            {
-                var user = new User
-                {
-                    UserName = model.Email,
-                    Email = model.Email
+            //if(_productDbContext.Users.Any(u=> u.UserName == model.Email))
+            //{
+            //    var registeredUser = await _userManager.FindByEmailAsync(model.Email);
+            //    var result = await _signInManager.PasswordSignInAsync(registeredUser, model.Password, false, false);
+            //    if (!result.Succeeded) {
+            //        return BadRequest(result);
+            //    }
+            //}
+            //else
+            //{
+            //    var user = new User
+            //    {
+            //        UserName = model.Email,
+            //        Email = model.Email
 
-                };
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (!result.Succeeded) { 
-                    foreach(var error in result.Errors)
-                    {
-                        return BadRequest(error.Description);
-                    }
-                }
-                Thread.Sleep(3000);
-                await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
-            }
+            //    };
+            //    var result = await _userManager.CreateAsync(user, model.Password);
+            //    if (!result.Succeeded) { 
+            //        foreach(var error in result.Errors)
+            //        {
+            //            return BadRequest(error.Description);
+            //        }
+            //    }
+            //    Thread.Sleep(3000);
+            //    await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
+            //}
+            await _userService.LoginUser(model);
             HttpContext.Session.SetString("email", model.Email);
 
             return Ok(new {token = CreateToken(model.Email)});
