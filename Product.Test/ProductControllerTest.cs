@@ -16,7 +16,6 @@ namespace Product.Test
 {
     public class ProductControllerTest
     {
-        private readonly Mock<IHttpContextAccessor> _contextAccessorMock;
         private readonly Mock<IMediator> _mediatorMock;
         private readonly Mock<IConfiguration> _configurationMock;
         private readonly Mock<IUserService> _userServiceMock;
@@ -28,9 +27,8 @@ namespace Product.Test
             _configurationMock = new Mock<IConfiguration>();
             _userServiceMock = new Mock<IUserService>();
             _productServiceMock = new Mock<IProductService>();
-            _contextAccessorMock = new Mock<IHttpContextAccessor>();
             _controller = new ProductController(_configurationMock.Object,
-                _userServiceMock.Object, _productServiceMock.Object ,_contextAccessorMock.Object,_mediatorMock.Object);
+                _userServiceMock.Object, _productServiceMock.Object,_mediatorMock.Object);
         }
         [Fact]
         public async Task ProductController_GetAllProducts_ShouldReturnStatusCode200()

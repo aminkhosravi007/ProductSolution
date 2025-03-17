@@ -23,8 +23,9 @@ namespace Product.Application.Handlers
         public async Task<ProductModelDTO> Handle(AddProductCommand request, CancellationToken cancellationToken)
         {
             var model = _mapper.Map<ProductModel>(request.product);
-            await _productService.AddProduct(model);
-            return request.product;
+            var savedProduct = await _productService.AddProduct(model);
+
+            return _mapper.Map<ProductModelDTO>(savedProduct);
         }
     }
 }

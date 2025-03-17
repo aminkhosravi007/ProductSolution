@@ -21,7 +21,7 @@ namespace Product.Infrastructure
             _dbContext = dbContext;
             _contextAccessor = contextAccessor;
         }
-        public async Task<ProductModel> AddProduct(ProductModel model)
+        public async Task<Domain.ProductModel> AddProduct(Domain.ProductModel model)
         {
             model.IssuedAdminToken = _contextAccessor.HttpContext.Session.GetString("email");
             await _dbContext.Products.AddAsync(model);
@@ -36,27 +36,27 @@ namespace Product.Infrastructure
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<List<ProductModel>> GetAllProducts()
+        public async Task<List<Domain.ProductModel>> GetAllProducts()
         {
             var products = await _dbContext.Products.ToListAsync();
             return products;
         }
 
-        public async Task<ProductModel> GetProductById(int id)
+        public async Task<Domain.ProductModel> GetProductById(int id)
         {
             var product = await _dbContext.Products.FindAsync(id);
             return product;
 
         }
 
-        public async Task<ProductModel> UpdateProduct(ProductModel model)
+        public async Task<Domain.ProductModel> UpdateProduct(Domain.ProductModel model)
         {
             _dbContext.Products.Update(model);
             _dbContext.Entry(model).Property(x => x.IssuedAdminToken).IsModified = false;
             await _dbContext.SaveChangesAsync();
             return model;
         }
-        public async Task<List<ProductModel>> GetProductsIssuedByAdmin(string adminEmail)
+        public async Task<List<Domain.ProductModel>> GetProductsIssuedByAdmin(string adminEmail)
         {
             var products = await _dbContext.Products.Where(p=> p.IssuedAdminToken.Contains(adminEmail)).ToListAsync();
             return products;

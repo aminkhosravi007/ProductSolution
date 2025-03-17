@@ -14,7 +14,7 @@ namespace Product.Application
         {
             _repository = repository;
         }
-        public async Task<ProductModel> AddProduct(ProductModel model)
+        public async Task<Domain.ProductModel> AddProduct(Domain.ProductModel model)
         {
             await _repository.AddProduct(model);
             return model;
@@ -25,22 +25,22 @@ namespace Product.Application
             await _repository.DeleteProduct(id);
         }
 
-        public Task<List<ProductModel>> GetAllProducts()
+        public Task<List<Domain.ProductModel>> GetAllProducts()
         {
             return _repository.GetAllProducts();
         }
 
-        public async Task<ProductModel> GetProductById(int id)
+        public async Task<Domain.ProductModel> GetProductById(int id)
         {
             return await _repository.GetProductById(id);
         }
 
-        public async Task<ProductModel> UpdateProduct(ProductModel model)
+        public async Task<Domain.ProductModel> UpdateProduct(Domain.ProductModel model)
         {
             await _repository.UpdateProduct(model);
             return model;
         }
-        public async Task<List<ProductModel>> GetProductsIssuedByAdmin(string adminEmail)
+        public async Task<List<Domain.ProductModel>> GetProductsIssuedByAdmin(string adminEmail)
         {
            return await _repository.GetProductsIssuedByAdmin(adminEmail);
 

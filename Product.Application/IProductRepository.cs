@@ -9,12 +9,12 @@ namespace Product.Application
 {
     public interface IProductRepository
     {
-        Task<List<ProductModel>> GetAllProducts();
-        Task<ProductModel> GetProductById(int id);
-        Task<ProductModel> AddProduct(ProductModel model);
-        Task<ProductModel> UpdateProduct(ProductModel model);
+        Task<List<Domain.ProductModel>> GetAllProducts();
+        Task<Domain.ProductModel> GetProductById(int id);
+        Task<Domain.ProductModel> AddProduct(Domain.ProductModel model);
+        Task<Domain.ProductModel> UpdateProduct(Domain.ProductModel model);
         Task DeleteProduct(int id);
-        Task<List<ProductModel>> GetProductsIssuedByAdmin(string adminEmail);
+        Task<List<Domain.ProductModel>> GetProductsIssuedByAdmin(string adminEmail);
 
 
     }

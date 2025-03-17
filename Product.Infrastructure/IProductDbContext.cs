@@ -10,7 +10,7 @@ namespace Product.Infrastructure
 {
     public interface IProductDbContext
     {
-        public DbSet<ProductModel> Products { get; set; }
+        public DbSet<Domain.ProductModel> Products { get; set; }
         public DbSet<Manufacture> Manufactures { get; set; }    
     }
 }

@@ -27,15 +27,13 @@ namespace Product.API.Controllers
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
         private readonly IProductService _productService;
-        private readonly IHttpContextAccessor _contextAccessor;
 
-        public ProductController(IConfiguration configuration, IUserService userService, IProductService productService, IHttpContextAccessor contextAccessor ,IMediator mediator)
+        public ProductController(IConfiguration configuration, IUserService userService, IProductService productService,IMediator mediator)
         {
             _configuration = configuration;
             _userService = userService;
             _mediator = mediator;
             _productService = productService;
-            _contextAccessor = contextAccessor;
         }
         [HttpGet]
         [AllowAnonymous]
@@ -61,31 +59,31 @@ namespace Product.API.Controllers
             return Ok(product);
         }
         [HttpPost]
-        public async Task<IActionResult> AddProduct([FromBody] ProductModelDTO dTO)
+        public async Task<IActionResult> AddProduct([FromBody] ProductModelDTO dto)
         {
-            var command = new AddProductCommand(dTO);
-            if(dTO == null)
+            var command = new AddProductCommand(dto);
+            if(dto == null)
             {
                 return BadRequest("Invalid data!");
             }
-            await _mediator.Send(command);
-            return CreatedAtRoute("GetProduct", new {id = dTO.Id}, dTO);
+            var createdProduct = await _mediator.Send(command);
+            return CreatedAtRoute("GetProduct", new {id = createdProduct.Id}, createdProduct);
 
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateProduct([FromBody] ProductModelDTO dTO)
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductModelDTO dto)
         {
-            var command = new UpdateProductCommand(dTO);
-            var product = await _mediator.Send(new GetProductByIdQuery(dTO.Id));
-            var dbProduct = await _productService.GetProductById(dTO.Id);
+            var command = new UpdateProductCommand(dto);
+            var product = await _mediator.Send(new GetProductByIdQuery(dto.Id));
+            var dbProduct = await _productService.GetProductById(dto.Id);
             if (product == null)
             {
                 return NotFound("Not found such a product");
             }
             else if (dbProduct?.IssuedAdminToken == User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value)
             {
-                await _mediator.Send(command);
-                return CreatedAtRoute("GetProduct", new { id = dTO.Id }, dTO);
+                var updatedProduct = await _mediator.Send(command);
+                return CreatedAtRoute("GetProduct", new { id = updatedProduct.Id }, updatedProduct);
             }
             return Unauthorized();
             

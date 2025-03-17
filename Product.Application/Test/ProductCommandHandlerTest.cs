@@ -16,7 +16,7 @@ namespace Product.Application.Test
         public void ProductHandler_CheckCommands()
         {
             // Arrange
-            var product = new ProductModel
+            var product = new Domain.ProductModel
             {
                 Id = 1,
                 Name = "Test Product",

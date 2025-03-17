@@ -16,5 +16,6 @@ namespace Product.Domain
         public string? ManufacturePhone { get; set; }
         [EmailAddress]
         public string? ManufactureEmail { get; set; }
+        public ICollection<ProductModel> Products { get; set; } = new List<ProductModel>();
     }
 }

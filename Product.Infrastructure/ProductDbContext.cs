@@ -16,7 +16,7 @@ namespace Product.Infrastructure
         {
                 
         }
-        public DbSet<ProductModel> Products { get; set; }
+        public DbSet<Domain.ProductModel> Products { get; set; }
         public DbSet<Manufacture> Manufactures { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -44,5 +44,10 @@ namespace Product.Infrastructure
                 }
                 );
         }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    base.OnConfiguring(optionsBuilder);
+        //    optionsBuilder.UseLazyLoadingProxies();
+        //}
     }
 }
