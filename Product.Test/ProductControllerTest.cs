@@ -3,12 +3,18 @@ using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Product.API.Controllers;
 using Product.Application;
 using Product.Application.Commands;
 using Product.Application.Queries;
 using Product.Domain;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 using Microsoft.AspNetCore.Http;
@@ -98,7 +104,7 @@ namespace Product.Test
                 ManufactureId = 1,
                 Name = "glass"
             });
-        
+
             //act
             var result = await _controller.UpdateProduct(dto);
             //assert
